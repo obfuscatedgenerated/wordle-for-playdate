@@ -79,7 +79,6 @@ local handlers = {
     end,
 }
 
-
 function setup()
     playdate.inputHandlers.push(handlers)
 end
