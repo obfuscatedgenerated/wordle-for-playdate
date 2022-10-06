@@ -1,0 +1,1 @@
+pdc ./src/ ./build/Wordle.pdx
