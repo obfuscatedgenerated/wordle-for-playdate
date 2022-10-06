@@ -71,7 +71,7 @@ function Textbox:advanceCharacter(change)
     end
 end
 
-local textbox = Textbox("A", 0, centerX, centerY, centerX * 2, centerY * 2)
+local textbox = Textbox("A")
 
 local handlers = {
     cranked = function(change, accChange)
