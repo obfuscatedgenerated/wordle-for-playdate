@@ -71,11 +71,38 @@ function Textbox:advanceCharacter(change)
     end
 end
 
-local textbox = Textbox("A")
+local letters_start_x <const> = 100
+
+local letters_size_x <const> = 50
+local letters_size_y <const> = 50
+
+local letters = {
+    Textbox("A", 0, letters_start_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y),
+}
+
+local current_letter = 1
 
 local handlers = {
     cranked = function(change, accChange)
-        textbox:advanceCharacter(change)
+        letters[current_letter]:advanceCharacter(change)
+    end,
+
+    AButtonDown = function()
+        current_letter = current_letter + 1 -- TODO: highlight selected letter
+        if current_letter > #letters then
+            current_letter = 1 -- currently wraps back around TODO: replace with submit logic
+        end
+    end,
+
+    BButtonDown = function()
+        current_letter = current_letter - 1
+        if current_letter < 1 then
+            current_letter = 1 -- currently prevents further button press TODO: add error sound
+        end
     end,
 }
 
