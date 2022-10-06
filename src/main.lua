@@ -10,31 +10,35 @@ local centerY <const> = 120
 
 local alphabet <const> = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-local textbox = gfx.sprite.new()
-textbox:setSize(centerX * 2, centerY * 2)
-textbox:moveTo(centerX, centerY)
-textbox.currentText = "A"
-textbox.crank = 0
-textbox:add()
-
 function assertiveSound(path)
     local sfx = playdate.sound.fileplayer.new(path)
     assert(sfx)
     return sfx
 end
 
-
-local handlers = {
-    cranked = function(change, accChange)
-        textbox:advanceCharacter(change)
-    end,
-}
-
 local sounds = {
     click = assertiveSound("sfx/click"),
 }
 
-function textbox:draw()
+class("Textbox").extends(gfx.sprite)
+
+function Textbox.new(initText, initCrank, positionX, positionY, sizeX, sizeY)
+    return Textbox(initText, initCrank, positionX, positionY, sizeX, sizeY)
+end
+
+function Textbox:init(initText, initCrank, positionX, positionY, sizeX, sizeY)
+    Textbox.super.init(self)
+
+    self.currentText = initText or ""
+    self.crank = initCrank or 0
+
+    self:setSize(sizeX or (centerX * 2), sizeY or (centerY * 2))
+    self:moveTo(positionX or centerX, positionY or centerY)
+
+    self:add()
+end
+
+function Textbox:draw()
     gfx.pushContext()
     local text = self.currentText
     if text == nil then
@@ -44,16 +48,16 @@ function textbox:draw()
     gfx.popContext()
 end
 
-function textbox:setText(value)
+function Textbox:setText(value)
     self.currentText = value
     self:markDirty()
 end
 
-function textbox:getText()
+function Textbox:getText()
     return self.currentText
 end
 
-function textbox:advanceCharacter(change)
+function Textbox:advanceCharacter(change)
     local old_idx = (math.floor(self.crank) % 26) + 1
 
     local adjustedChange = change / 10
@@ -66,6 +70,15 @@ function textbox:advanceCharacter(change)
         sounds.click:play()
     end
 end
+
+local textbox = Textbox("A", 0, centerX, centerY, centerX * 2, centerY * 2)
+
+local handlers = {
+    cranked = function(change, accChange)
+        textbox:advanceCharacter(change)
+    end,
+}
+
 
 function setup()
     playdate.inputHandlers.push(handlers)
