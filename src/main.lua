@@ -57,10 +57,12 @@ function Textbox:getText()
     return self.currentText
 end
 
+local crank_divisor <const> = 10
+
 function Textbox:advanceCharacter(change)
     local old_idx = (math.floor(self.crank) % 26) + 1
 
-    local adjustedChange = change / 10
+    local adjustedChange = change / crank_divisor
     self.crank = self.crank + adjustedChange
 
     local idx = (math.floor(self.crank) % 26) + 1
@@ -86,24 +88,40 @@ local letters = {
 
 local current_letter = 1
 
+function next_letter()
+    current_letter = current_letter + 1 -- TODO: highlight selected letter
+    if current_letter > #letters then
+        current_letter = 1 -- currently wraps back around TODO: replace with submit logic
+    end
+end
+
+function previous_letter()
+    current_letter = current_letter - 1
+    if current_letter < 1 then
+        current_letter = 1 -- currently prevents further button press TODO: add error sound
+    end
+end
+
 local handlers = {
     cranked = function(change, accChange)
         letters[current_letter]:advanceCharacter(change)
     end,
 
-    AButtonDown = function()
-        current_letter = current_letter + 1 -- TODO: highlight selected letter
-        if current_letter > #letters then
-            current_letter = 1 -- currently wraps back around TODO: replace with submit logic
-        end
+    AButtonDown = next_letter,
+
+    BButtonDown = previous_letter,
+
+    upButtonDown = function()
+        letters[current_letter]:advanceCharacter(crank_divisor)
     end,
 
-    BButtonDown = function()
-        current_letter = current_letter - 1
-        if current_letter < 1 then
-            current_letter = 1 -- currently prevents further button press TODO: add error sound
-        end
+    downButtonDown = function()
+        letters[current_letter]:advanceCharacter(crank_divisor * -1)
     end,
+
+    rightButtonDown = next_letter,
+
+    leftButtonDown = previous_letter,
 }
 
 function setup()
