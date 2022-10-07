@@ -20,17 +20,28 @@ local sounds = {
     click = assertiveSound("sfx/click"),
 }
 
-class("Textbox").extends(gfx.sprite)
-
-function Textbox.new(initText, initCrank, positionX, positionY, sizeX, sizeY)
-    return Textbox(initText, initCrank, positionX, positionY, sizeX, sizeY)
+function assertiveFont(path)
+    local fnt = gfx.font.new(path)
+    assert(fnt)
+    return fnt
 end
 
-function Textbox:init(initText, initCrank, positionX, positionY, sizeX, sizeY)
+local fonts = {
+    mvp = assertiveFont("fnt/mvp"),
+}
+
+class("Textbox").extends(gfx.sprite)
+
+function Textbox.new(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
+    return Textbox(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
+end
+
+function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
     Textbox.super.init(self)
 
     self.currentText = initText or ""
     self.crank = initCrank or 0
+    self.font = initFont or nil
 
     self:setSize(sizeX or (centerX * 2), sizeY or (centerY * 2))
     self:moveTo(positionX or centerX, positionY or centerY)
@@ -40,11 +51,20 @@ end
 
 function Textbox:draw()
     gfx.pushContext()
+
     local text = self.currentText
+
     if text == nil then
         text = ""
     end
+
+    if self.font then
+        gfx.getFont()
+        gfx.setFont(self.font)
+    end
+
     gfx.drawTextAligned(text, self.width / 2, self.height / 2, kTextAlignment.center)
+    
     gfx.popContext()
 end
 
@@ -55,6 +75,15 @@ end
 
 function Textbox:getText()
     return self.currentText
+end
+
+function Textbox:setFont(fnt)
+    self.font = fnt
+    self:markDirty()
+end
+
+function Textbox:getFont()
+    return self.font
 end
 
 local crank_divisor <const> = 10
@@ -73,17 +102,21 @@ function Textbox:advanceCharacter(change)
     end
 end
 
+function Textbox:setFont(font)
+    gfx.setFont(font)
+end
+
 local letters_start_x <const> = 100
 
 local letters_size_x <const> = 50
 local letters_size_y <const> = 50
 
 local letters = {
-    Textbox("A", 0, letters_start_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y),
 }
 
 local current_letter = 1
