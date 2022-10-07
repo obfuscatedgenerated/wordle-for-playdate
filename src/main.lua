@@ -130,12 +130,16 @@ local letters_text_scale <const> = 4
 local letters_force_text_width <const> = nil
 local letters_force_text_height <const> = 8
 
+function generate_letter_textbox(idx)
+    return Textbox("A", 0, fonts.mvp, letters_start_x + idx * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height)
+end
+
 local letters = {
-    Textbox("A", 0, fonts.mvp, letters_start_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
-    Textbox("A", 0, fonts.mvp, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
+    generate_letter_textbox(0),
+    generate_letter_textbox(1),
+    generate_letter_textbox(2),
+    generate_letter_textbox(3),
+    generate_letter_textbox(4),
 }
 
 local current_letter = 1
