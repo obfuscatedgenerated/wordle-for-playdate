@@ -2,6 +2,7 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
+import "CoreLibs/animator"
 
 local gfx <const> = playdate.graphics
 
@@ -124,6 +125,15 @@ function Textbox:setFont(font)
     gfx.setFont(font)
 end
 
+local animators = {}
+
+function stop_shake()
+    sounds.stop:play()
+    animators.shake = playdate.graphics.animator.new(50, 0, 10)
+    animators.shake.repeatCount = 2
+    animators.shake.reverses = true
+end
+
 local letters_start_x <const> = 100
 
 local letters_size_x <const> = 50
@@ -150,7 +160,7 @@ local current_letter = 1
 function next_letter()
     if current_letter == #letters then
         --current_letter = #letters -- currently prevents further button press TODO: replace with submit logic
-        sounds.stop:play()
+        stop_shake()
     else
         current_letter = current_letter + 1 -- TODO: highlight selected letter
         sounds.next:play()
@@ -160,7 +170,7 @@ end
 function previous_letter()
     if current_letter == 1 then
         --current_letter = #letters
-        sounds.stop:play()
+        stop_shake()
     else
         current_letter = current_letter - 1 -- TODO: highlight selected letter
         sounds.back:play()
@@ -196,6 +206,14 @@ end
 setup()
 
 function playdate.update()
+    if animators.shake then
+        if animators.shake:ended() then
+            animators.shake = nil
+        else
+            playdate.display.setOffset(animators.shake:currentValue(), 0)
+        end
+    end
+
     gfx.sprite.update()
     playdate.timer.updateTimers()
 end
