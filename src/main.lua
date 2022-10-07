@@ -18,6 +18,9 @@ end
 
 local sounds = {
     click = assertiveSound("sfx/click"),
+    next = assertiveSound("sfx/next"),
+    back = assertiveSound("sfx/back"),
+    stop = assertiveSound("sfx/stop"),
 }
 
 function assertiveFont(path)
@@ -145,16 +148,22 @@ local letters = {
 local current_letter = 1
 
 function next_letter()
-    current_letter = current_letter + 1 -- TODO: highlight selected letter
-    if current_letter > #letters then
-        current_letter = 1 -- currently wraps back around TODO: replace with submit logic
+    if current_letter == #letters then
+        --current_letter = #letters -- currently prevents further button press TODO: replace with submit logic
+        sounds.stop:play()
+    else
+        current_letter = current_letter + 1 -- TODO: highlight selected letter
+        sounds.next:play()
     end
 end
 
 function previous_letter()
-    current_letter = current_letter - 1
-    if current_letter < 1 then
-        current_letter = 1 -- currently prevents further button press TODO: add error sound
+    if current_letter == 1 then
+        --current_letter = #letters
+        sounds.stop:play()
+    else
+        current_letter = current_letter - 1 -- TODO: highlight selected letter
+        sounds.back:play()
     end
 end
 
