@@ -30,18 +30,33 @@ local fonts = {
     mvp = assertiveFont("fnt/mvp"),
 }
 
-class("Textbox").extends(gfx.sprite)
-
-function Textbox.new(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
-    return Textbox(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
+function playdate.graphics.drawTextScaled(text, x, y, scale, forceWidth, forceHeight) -- thanks to u/Paul in the Playdate dev forum :)
+    local padding = string.upper(text) == text and 6 or 0 -- Weird padding hack?
+    local font = gfx.getFont()
+    local w <const> = forceWidth or font:getTextWidth(text)
+    local h <const> = forceHeight or font:getHeight() - padding
+    local img <const> = gfx.image.new(w, h, gfx.kColorClear)
+    gfx.lockFocus(img)
+    gfx.drawTextAligned(text, w / 2, 0, kTextAlignment.center)
+    gfx.unlockFocus()
+    img:drawScaled(x - (scale * w) / 2, y - (scale * h) / 2, scale)
 end
 
-function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY)
+class("Textbox").extends(gfx.sprite)
+
+function Textbox.new(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
+    return Textbox(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
+end
+
+function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
     Textbox.super.init(self)
 
     self.currentText = initText or ""
     self.crank = initCrank or 0
     self.font = initFont or nil
+    self.textScale = textScale or 1
+    self.forceTextWidth = forceTextWidth or nil
+    self.forceTextHeight = forceTextHeight or nil
 
     self:setSize(sizeX or (centerX * 2), sizeY or (centerY * 2))
     self:moveTo(positionX or centerX, positionY or centerY)
@@ -63,12 +78,12 @@ function Textbox:draw()
         gfx.setFont(self.font)
     end
 
-    gfx.drawTextAligned(text, self.width / 2, self.height / 2, kTextAlignment.center)
+    gfx.drawTextScaled(text, self.width / 2, self.height / 2, self.textScale, self.forceTextWidth, self.forceTextHeight)
     
     gfx.popContext()
 end
 
-function Textbox:setText(value)
+function Textbox:setText(value, scale)
     self.currentText = value
     self:markDirty()
 end
@@ -111,12 +126,16 @@ local letters_start_x <const> = 100
 local letters_size_x <const> = 50
 local letters_size_y <const> = 50
 
+local letters_text_scale <const> = 4
+local letters_force_text_width <const> = nil
+local letters_force_text_height <const> = 8
+
 local letters = {
-    Textbox("A", 0, fonts.mvp, letters_start_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, fonts.mvp, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y),
-    Textbox("A", 0, fonts.mvp, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y),
+    Textbox("A", 0, fonts.mvp, letters_start_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
+    Textbox("A", 0, fonts.mvp, letters_start_x + letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 2 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 3 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
+    Textbox("A", 0, fonts.mvp, letters_start_x + 4 * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height),
 }
 
 local current_letter = 1
