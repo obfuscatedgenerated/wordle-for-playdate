@@ -94,6 +94,7 @@ function submit()
                 if remaining_guesses == 0 then
                     lost = true
                     sounds.fail:play()
+                    stop_shake()
 
                     for i = 1, #letters do
                         playdate.timer.performAfterDelay((i - 1) * 100, -- fill out letters with correct word
@@ -104,7 +105,19 @@ function submit()
                         )
                     end
                 else
-                    allow_input = true
+                    playdate.timer.performAfterDelay(250, -- reset (this is temporary, replace with more user friendly solution involving list of past guesses)
+                        function()
+                            for i = 1, #letters do
+                                if i == 1 then
+                                    letters[1]:fillSelected()
+                                else
+                                    letters[i]:fillReset()
+                                end
+                            end
+
+                            allow_input = true
+                        end
+                    )
                 end
             end
         end
