@@ -137,7 +137,7 @@ end
 
 local handlers = {
     cranked = function(change, accChange)
-        if allow_input then next_letter()
+        if allow_input then
             letters[current_letter]:advanceCharacter(change)
         end
     end,
@@ -147,13 +147,13 @@ local handlers = {
     BButtonDown = function() if allow_input then previous_letter() end end,
 
     upButtonDown = function()
-        if allow_input then next_letter()
+        if allow_input then
             letters[current_letter]:advanceCharacter(crank_divisor)
         end
     end,
 
     downButtonDown = function()
-        if allow_input then next_letter()
+        if allow_input then
             letters[current_letter]:advanceCharacter(crank_divisor * -1)
         end
     end,
