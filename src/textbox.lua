@@ -1,10 +1,13 @@
 class("Textbox").extends(gfx.sprite)
 
-function Textbox.new(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
-    return Textbox(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
+function Textbox.new(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth,
+                     forceTextHeight)
+    return Textbox(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth,
+        forceTextHeight)
 end
 
-function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth, forceTextHeight)
+function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX, sizeY, textScale, forceTextWidth,
+                      forceTextHeight)
     Textbox.super.init(self)
 
     self.currentText = initText or ""
@@ -13,6 +16,10 @@ function Textbox:init(initText, initCrank, initFont, positionX, positionY, sizeX
     self.textScale = textScale or 1
     self.forceTextWidth = forceTextWidth or nil
     self.forceTextHeight = forceTextHeight or nil
+
+    self.rectFilled = false
+    self.rectDarkGrey = false
+    self.rectLightGrey = false
 
     self:setSize(sizeX or (centerX * 2), sizeY or (centerY * 2))
     self:moveTo(positionX or centerX, positionY or centerY)
@@ -34,8 +41,32 @@ function Textbox:draw()
         gfx.setFont(self.font)
     end
 
+    if self.rectFilled then
+        local old_color = gfx.getColor()
+
+        if self.rectDarkGrey then -- TODO: simplify this. maybe use a single bitfield then selectively apply funcs?
+            gfx.setPattern({ 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 })
+            gfx.fillRoundRect(0, 0, self.width, self.height, 10)
+            gfx.setColor(old_color)
+            gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+        elseif self.rectLightGrey then
+            gfx.setPattern({ 0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F })
+            gfx.fillRoundRect(0, 0, self.width, self.height, 10)
+            gfx.setColor(old_color)
+            gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+            gfx.drawRoundRect(0, 0, self.width, self.height, 10)
+            gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+        else
+            gfx.fillRoundRect(0, 0, self.width, self.height, 10)
+            gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+        end
+    else
+        gfx.drawRoundRect(0, 0, self.width, self.height, 10)
+    end
+
+
     gfx.drawTextScaled(text, self.width / 2, self.height / 2, self.textScale, self.forceTextWidth, self.forceTextHeight)
-    
+
     gfx.popContext()
 end
 
@@ -73,6 +104,38 @@ end
 
 function Textbox:setFont(font)
     gfx.setFont(font)
+end
+
+function Textbox:fillReset()
+    self.rectFilled = false
+    self.rectDarkGrey = false
+    self.rectLightGrey = false
+    self:markDirty()
+end
+
+function Textbox:fillSelected()
+    self.rectFilled = true
+    self.rectDarkGrey = false
+    self.rectLightGrey = true
+    self:markDirty()
+end
+
+function Textbox:fillCorrect()
+    self.rectFilled = true
+    self.rectDarkGrey = false
+    self.rectLightGrey = false
+    self:markDirty()
+end
+
+function Textbox:fillIncorrect()
+    self:fillReset()
+end
+
+function Textbox:fillUnorder()
+    self.rectFilled = true
+    self.rectDarkGrey = true
+    self.rectLightGrey = false
+    self:markDirty()
 end
 
 return Textbox

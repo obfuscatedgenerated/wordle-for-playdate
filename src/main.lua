@@ -54,32 +54,43 @@ end
 
 function submit()
     local guess = get_input_word()
-    if guess == word then
-        sounds.win:play()
-    else
-        for i = 1, #letters do
-            playdate.timer.performAfterDelay((i - 1) * 250, -- simplest way to schedule incrementing delays (like sleeping) without recursion
-                function()
-                    local letter_guess = guess:sub(i, i)
-                    if letter_guess == word:sub(i, i) then -- letter is correct in correct position
-                        sounds.correct:play()
-                    elseif (word:find(letter_guess)) then -- letter is correct but in wrong position
-                        sounds.unorder:play()
-                    else -- letter is incorrect
-                        sounds.incorrect:play()
-                    end
+    for i = 1, #letters do
+        playdate.timer.performAfterDelay((i - 1) * 250,
+            -- simplest way to schedule incrementing delays (like sleeping) without recursion
+            function()
+                local letter_guess = guess:sub(i, i)
+                if letter_guess == word:sub(i, i) then -- letter is correct in correct position
+                    sounds.correct:play()
+                    letters[i]:fillCorrect()
+                elseif (word:find(letter_guess)) then -- letter is correct but in wrong position
+                    sounds.unorder:play()
+                    letters[i]:fillUnorder()
+                else -- letter is incorrect
+                    sounds.incorrect:play()
+                    letters[i]:fillIncorrect()
                 end
-            )
-        end
+            end
+        )
     end
+
+    playdate.timer.performAfterDelay(5 * 250,
+        function()
+            if guess == word then
+                sounds.win:play()
+            end
+        end
+    )
 end
 
 function next_letter()
     if current_letter == #letters then
         submit()
+        letters[current_letter]:fillReset()
         current_letter = 1
     else
-        current_letter = current_letter + 1 -- TODO: highlight selected letter
+        letters[current_letter]:fillReset()
+        current_letter = current_letter + 1
+        letters[current_letter]:fillSelected()
         sounds.next:play()
     end
 end
@@ -88,7 +99,9 @@ function previous_letter()
     if current_letter == 1 then
         stop_shake()
     else
-        current_letter = current_letter - 1 -- TODO: highlight selected letter
+        letters[current_letter]:fillReset()
+        current_letter = current_letter - 1
+        letters[current_letter]:fillSelected()
         sounds.back:play()
     end
 end
@@ -117,6 +130,7 @@ local handlers = {
 
 function setup()
     playdate.inputHandlers.push(handlers)
+    letters[current_letter]:fillSelected()
 end
 
 setup()
