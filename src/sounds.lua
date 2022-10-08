@@ -13,6 +13,7 @@ local sounds = {
     incorrect = assertiveSound("sfx/incorrect"),
     unorder = assertiveSound("sfx/unorder"),
     win = assertiveSound("sfx/win"),
+    fail = assertiveSound("sfx/fail"),
 }
 
 return sounds

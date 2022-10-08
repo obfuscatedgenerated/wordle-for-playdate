@@ -10,6 +10,12 @@ import "global_util"
 local Textbox = import "textbox"
 
 local word <const> = "CRANK" -- test word
+local remaining_guesses = 6
+
+local won = false
+local lost = false
+
+local allow_input = true
 
 local animators = {}
 
@@ -53,6 +59,8 @@ function get_input_word()
 end
 
 function submit()
+    allow_input = false
+
     local guess = get_input_word()
     for i = 1, #letters do
         playdate.timer.performAfterDelay((i - 1) * 250,
@@ -76,7 +84,28 @@ function submit()
     playdate.timer.performAfterDelay(5 * 250,
         function()
             if guess == word then
+                won = true
                 sounds.win:play()
+            end
+
+            if not won then
+                remaining_guesses = remaining_guesses - 1
+
+                if remaining_guesses == 0 then
+                    lost = true
+                    sounds.fail:play()
+
+                    for i = 1, #letters do
+                        playdate.timer.performAfterDelay((i - 1) * 100, -- fill out letters with correct word
+                            function()
+                                letters[i]:fillCorrect()
+                                letters[i]:setText(word:sub(i, i))
+                            end
+                        )
+                    end
+                else
+                    allow_input = true
+                end
             end
         end
     )
@@ -111,21 +140,25 @@ local handlers = {
         letters[current_letter]:advanceCharacter(change)
     end,
 
-    AButtonDown = next_letter,
+    AButtonDown = function() if allow_input then next_letter() end end,
 
-    BButtonDown = previous_letter,
+    BButtonDown = function() if allow_input then previous_letter() end end,
 
     upButtonDown = function()
-        letters[current_letter]:advanceCharacter(crank_divisor)
+        if allow_input then next_letter()
+            letters[current_letter]:advanceCharacter(crank_divisor)
+        end
     end,
 
     downButtonDown = function()
-        letters[current_letter]:advanceCharacter(crank_divisor * -1)
+        if allow_input then next_letter()
+            letters[current_letter]:advanceCharacter(crank_divisor * -1)
+        end
     end,
 
-    rightButtonDown = next_letter,
+    rightButtonDown = function() if allow_input then next_letter() end end,
 
-    leftButtonDown = previous_letter,
+    leftButtonDown = function() if allow_input then previous_letter() end end,
 }
 
 function setup()
