@@ -9,6 +9,8 @@ import "global_util"
 
 local Textbox = import "textbox"
 
+local word <const> = "CRANK" -- test word
+
 local animators = {}
 
 function stop_shake()
@@ -28,7 +30,8 @@ local letters_force_text_width <const> = nil
 local letters_force_text_height <const> = 8
 
 function generate_letter_textbox(idx)
-    return Textbox("A", 0, fonts.mvp, letters_start_x + idx * letters_size_x, centerY, letters_size_x, letters_size_y, letters_text_scale, letters_force_text_width, letters_force_text_height)
+    return Textbox("A", 0, fonts.mvp, letters_start_x + idx * letters_size_x, centerY, letters_size_x, letters_size_y,
+        letters_text_scale, letters_force_text_width, letters_force_text_height)
 end
 
 local letters = {
@@ -41,10 +44,40 @@ local letters = {
 
 local current_letter = 1
 
+function get_input_word()
+    local input_word = ""
+    for i = 1, #letters do
+        input_word = input_word .. letters[i]:getText()
+    end
+    return input_word
+end
+
+function submit()
+    local guess = get_input_word()
+    if guess == word then
+        sounds.win:play()
+    else
+        for i = 1, #letters do
+            playdate.timer.performAfterDelay((i - 1) * 250, -- simplest way to schedule incrementing delays (like sleeping) without recursion
+                function()
+                    local letter_guess = guess:sub(i, i)
+                    if letter_guess == word:sub(i, i) then -- letter is correct in correct position
+                        sounds.correct:play()
+                    elseif (word:find(letter_guess)) then -- letter is correct but in wrong position
+                        sounds.unorder:play()
+                    else -- letter is incorrect
+                        sounds.incorrect:play()
+                    end
+                end
+            )
+        end
+    end
+end
+
 function next_letter()
     if current_letter == #letters then
-        --current_letter = #letters -- currently prevents further button press TODO: replace with submit logic
-        stop_shake()
+        submit()
+        current_letter = 1
     else
         current_letter = current_letter + 1 -- TODO: highlight selected letter
         sounds.next:play()
@@ -53,7 +86,6 @@ end
 
 function previous_letter()
     if current_letter == 1 then
-        --current_letter = #letters
         stop_shake()
     else
         current_letter = current_letter - 1 -- TODO: highlight selected letter

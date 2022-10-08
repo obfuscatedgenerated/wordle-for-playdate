@@ -9,6 +9,10 @@ local sounds = {
     next = assertiveSound("sfx/next"),
     back = assertiveSound("sfx/back"),
     stop = assertiveSound("sfx/stop"),
+    correct = assertiveSound("sfx/correct"),
+    incorrect = assertiveSound("sfx/incorrect"),
+    unorder = assertiveSound("sfx/unorder"),
+    win = assertiveSound("sfx/win"),
 }
 
 return sounds
