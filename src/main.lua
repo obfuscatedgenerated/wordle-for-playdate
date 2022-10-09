@@ -204,12 +204,14 @@ function playdate.update()
         end
     end
 
+    gfx.sprite.update()
+
     if show_crank_alert then
         show_crank_alert = playdate.isCrankDocked()
         playdate.ui.crankIndicator:update()
     end
 
-    gfx.sprite.update()
+    
     playdate.timer.updateTimers()
 end
 
