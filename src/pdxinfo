@@ -1,6 +1,6 @@
 name=Wordle for Playdate
 author=obfuscatedgenerated
-description=When all you have is a ton of bricks, everything looks like a paddle.
+description=An unofficial Wordle clone for the Playdate!
 bundleID=codes.ollieg.wordle-for-playdate
 version=1.0
 buildNumber=
