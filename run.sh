@@ -1,1 +1,1 @@
-PlaydateSimulator.exe ./build/Wordle.pdx
+PlaydateSimulator ./build/Wordle.pdx

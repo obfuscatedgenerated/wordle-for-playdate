@@ -1,0 +1,9 @@
+name=Wordle for Playdate
+author=obfuscatedgenerated
+description=When all you have is a ton of bricks, everything looks like a paddle.
+bundleID=codes.ollieg.wordle-for-playdate
+version=1.0
+buildNumber=
+imagePath=img/card
+launchSoundPath=sfx/win
+contentWarning=The word list in this game is only available in English.
