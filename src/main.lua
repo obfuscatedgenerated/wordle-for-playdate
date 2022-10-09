@@ -3,6 +3,7 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/animator"
+import "CoreLibs/ui"
 
 import "global_consts"
 import "global_util"
@@ -19,9 +20,11 @@ local mvp_force_text_width <const> = nil
 local mvp_force_text_height <const> = 8
 
 local rem_guess_text = Textbox("Remaining guesses: " .. remaining_guesses, 0, nil, centerX, 15, 200, 50,
-1, nil, nil, true)
+    1, nil, nil, true)
 
 local allow_input = true
+
+local show_crank_alert = playdate.isCrankDocked()
 
 local animators = {}
 
@@ -182,12 +185,15 @@ local handlers = {
     leftButtonDown = function() if allow_input then previous_letter() end end,
 }
 
-function setup()
-    playdate.inputHandlers.push(handlers)
-    letters[current_letter]:fillSelected()
-end
+local menu = playdate.getSystemMenu()
 
-setup()
+local menuItem, error = menu:addMenuItem("help", function()
+    print("help")
+end)
+
+local checkmarkMenuItem, error = menu:addCheckmarkMenuItem("hard mode", true, function(value)
+    print("Hard mode: ", value)
+end)
 
 function playdate.update()
     if animators.shake then
@@ -198,6 +204,21 @@ function playdate.update()
         end
     end
 
+    if show_crank_alert then
+        show_crank_alert = playdate.isCrankDocked()
+        playdate.ui.crankIndicator:update()
+    end
+
     gfx.sprite.update()
     playdate.timer.updateTimers()
 end
+
+function setup()
+    playdate.inputHandlers.push(handlers)
+    letters[current_letter]:fillSelected()
+    if show_crank_alert then
+        playdate.ui.crankIndicator:start()
+    end
+end
+
+setup()
