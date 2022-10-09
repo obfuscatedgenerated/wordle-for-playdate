@@ -15,6 +15,12 @@ local remaining_guesses = 6
 local won = false
 local lost = false
 
+local mvp_force_text_width <const> = nil
+local mvp_force_text_height <const> = 8
+
+local rem_guess_text = Textbox("Remaining guesses: " .. remaining_guesses, 0, nil, centerX, 15, 200, 50,
+1, nil, nil, true)
+
 local allow_input = true
 
 local animators = {}
@@ -32,12 +38,10 @@ local letters_size_x <const> = 50
 local letters_size_y <const> = 50
 
 local letters_text_scale <const> = 4
-local letters_force_text_width <const> = nil
-local letters_force_text_height <const> = 8
 
 function generate_letter_textbox(idx)
     return Textbox("A", 0, fonts.mvp, letters_start_x + idx * letters_size_x, centerY, letters_size_x, letters_size_y,
-        letters_text_scale, letters_force_text_width, letters_force_text_height)
+        letters_text_scale, mvp_force_text_width, mvp_force_text_height, true)
 end
 
 local letters = {
@@ -90,6 +94,7 @@ function submit()
 
             if not won then
                 remaining_guesses = remaining_guesses - 1
+                rem_guess_text:setText("Remaining guesses: " .. remaining_guesses)
 
                 if remaining_guesses == 0 then
                     lost = true
@@ -105,7 +110,8 @@ function submit()
                         )
                     end
                 else
-                    playdate.timer.performAfterDelay(250, -- reset (this is temporary, replace with more user friendly solution involving list of past guesses)
+                    playdate.timer.performAfterDelay(250,
+                        -- reset (this is temporary, replace with more user friendly solution involving list of past guesses)
                         function()
                             for i = 1, #letters do
                                 if i == 1 then
