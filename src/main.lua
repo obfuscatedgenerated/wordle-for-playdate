@@ -134,55 +134,66 @@ function submit()
 end
 
 function next_letter()
-    if current_letter == #letters then
-        submit()
-        letters[current_letter]:fillReset()
-        current_letter = 1
-    else
-        letters[current_letter]:fillReset()
-        current_letter = current_letter + 1
-        letters[current_letter]:fillSelected()
-        sounds.next:play()
+    if allow_input then
+        show_crank_alert = false
+
+        if current_letter == #letters then
+            submit()
+            letters[current_letter]:fillReset()
+            current_letter = 1
+        else
+            letters[current_letter]:fillReset()
+            current_letter = current_letter + 1
+            letters[current_letter]:fillSelected()
+            sounds.next:play()
+        end
     end
 end
 
 function previous_letter()
-    if current_letter == 1 then
-        stop_shake()
-    else
-        letters[current_letter]:fillReset()
-        current_letter = current_letter - 1
-        letters[current_letter]:fillSelected()
-        sounds.back:play()
+    if allow_input then
+        show_crank_alert = false
+
+        if current_letter == 1 then
+            stop_shake()
+        else
+            letters[current_letter]:fillReset()
+            current_letter = current_letter - 1
+            letters[current_letter]:fillSelected()
+            sounds.back:play()
+        end
     end
 end
 
 local handlers = {
     cranked = function(change, accChange)
         if allow_input then
+            show_crank_alert = false
             letters[current_letter]:advanceCharacter(change)
         end
     end,
 
-    AButtonDown = function() if allow_input then next_letter() end end,
+    AButtonDown = next_letter,
 
-    BButtonDown = function() if allow_input then previous_letter() end end,
+    BButtonDown = previous_letter,
 
     upButtonDown = function()
         if allow_input then
+            show_crank_alert = false
             letters[current_letter]:advanceCharacter(crank_divisor)
         end
     end,
 
     downButtonDown = function()
         if allow_input then
+            show_crank_alert = false
             letters[current_letter]:advanceCharacter(crank_divisor * -1)
         end
     end,
 
-    rightButtonDown = function() if allow_input then next_letter() end end,
+    rightButtonDown = next_letter,
 
-    leftButtonDown = function() if allow_input then previous_letter() end end,
+    leftButtonDown = previous_letter,
 }
 
 local menu = playdate.getSystemMenu()
@@ -211,7 +222,7 @@ function playdate.update()
         playdate.ui.crankIndicator:update()
     end
 
-    
+
     playdate.timer.updateTimers()
 end
 
