@@ -202,7 +202,7 @@ local menuItem, error = menu:addMenuItem("help", function()
     print("help")
 end)
 
-local checkmarkMenuItem, error = menu:addCheckmarkMenuItem("hard mode", true, function(value)
+local checkmarkMenuItem, error = menu:addCheckmarkMenuItem("hard mode", false, function(value)
     print("Hard mode: ", value)
 end)
 
